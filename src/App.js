@@ -13,28 +13,18 @@ function App(props) {
     scoreDices: [2,5],
     activePlayer: 0,
     isPlaying: false,
+    myAlert: false,
     isPopup: false,
-    finalScore: ''
+    finalScore: 'init'
   })
 
-  function openPopup () {
-    if (info.finalScore !== '') {
-      if (info.finalScore <= 0) {
-        alert('Nhập số Dương đi babe')
-      } else if (isNaN(info.finalScore)) {
-        alert('Không được nhập Chữ')
-      } else {
+  function openPopup (finalScore) {
         setInfo(prev => {
           return {
             ...prev,
-            isPopup: true,
-            isPlaying: true
+            isPopup: true
           }
         })
-      }
-    } else {
-      alert('Không được để trống Final Score!')
-    }
   }
 
   function startGame () {
@@ -46,8 +36,7 @@ function App(props) {
         currentScore: 0,
         scoreDices: [1,1],
         activePlayer: 0,
-        isPlaying: true,
-        myAlert: false
+        isPlaying: true
       }
     })
   }
@@ -119,12 +108,8 @@ function App(props) {
           scorePlayers: cloneScorePlayers,
         }
       })
-      
-      console.log('isWinner trong function: ', isWinner)
-
-      if (!isWinner) {
-        nextPlayer()
-      }
+      // debugger
+      nextPlayer()
 
     } else {
       alert('Vui lòng nhấn nút NEW GAME để bắt đầu chơi!')
@@ -143,18 +128,28 @@ function App(props) {
     
 
   function handleFinalScore (finalScorexxx) {
+    // if (finalScorexxx !== '' && finalScorexxx > 0) {
       setInfo(prev => ({...prev, finalScore: +finalScorexxx}))
+    // }
+      
   }
 
   function isWinnerX (scorePlayersxxx, finalScorexxx) {
-    if (scorePlayersxxx[0] >= finalScorexxx || scorePlayersxxx[1] >= finalScorexxx ) {
-      setInfo(prev => ({
-        ...prev,
-        isPlaying: false
-      }))
-      return true
+    if (finalScorexxx !== 'init') {
+      if (scorePlayersxxx[0] >= finalScorexxx || scorePlayersxxx[1] >= finalScorexxx ) {
+        // debugger
+        setInfo(prev => ({
+          ...prev,
+          isPlaying: false
+        }))
+        // chay lai nextPlayer de active dung nguoi chien thang
+        // do loi chay nextPlayer ở nút Hold
+        nextPlayer()
+        return true
+      }
+      return false
     }
-    return false
+      
   }
 
 
@@ -176,6 +171,11 @@ function App(props) {
   }, [info.myAlert, info.activePlayer])
 
 
+  // useEffect(() => {
+  //   openPopup(info.finalScore)
+  // }, [info.finalScore])
+
+
 
 
   return (
@@ -184,7 +184,7 @@ function App(props) {
         isWinner {JSON.stringify(isWinner)} <br />
         activePlayer {JSON.stringify(info.activePlayer)}
         <Players isWinner={isWinner} scorePlayers={info.scorePlayers} currentScore={info.currentScore} activePlayer={info.activePlayer}/>
-        <Control openPopup={openPopup} handleRollDice={handleRollDice} handleHold={handleHold} handleFinalScore={handleFinalScore} isPlaying={info.isPlaying} />
+        <Control handleRollDice={handleRollDice} handleHold={handleHold} handleFinalScore={handleFinalScore} openPopup={openPopup} isPlaying={info.isPlaying} />
         <Dices scoreDices={info.scoreDices} />
       </div>
       <Popup isPopup={info.isPopup} startGame={startGame}/>
